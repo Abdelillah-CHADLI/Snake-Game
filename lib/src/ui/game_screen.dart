@@ -50,8 +50,23 @@ class _GameScreenState extends State<GameScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Score: ${controller.score}'),
                 Row(children: [
+                  Text('Score: ${controller.score}'),
+                  const SizedBox(width: 12),
+                  Text('High: ${controller.highScore}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                ]),
+                Row(children: [
+                  DropdownButton<String>(
+                    value: controller.difficulty,
+                    items: const [
+                      DropdownMenuItem(value: 'Easy', child: Text('Easy')),
+                      DropdownMenuItem(value: 'Normal', child: Text('Normal')),
+                      DropdownMenuItem(value: 'Hard', child: Text('Hard')),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) controller.setDifficulty(v);
+                    },
+                  ),
                   IconButton(
                     icon: Icon(controller.running ? Icons.pause : Icons.play_arrow),
                     onPressed: () => controller.running ? controller.pause() : controller.start(),
