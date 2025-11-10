@@ -1,3 +1,5 @@
+import 'position.dart';
+
 enum Direction { up, down, left, right }
 
 extension DirectionVector on Direction {

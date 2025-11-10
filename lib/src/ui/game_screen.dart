@@ -13,7 +13,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  Offset? _dragStart;
+  // Drag start not needed currently; removed to satisfy linter
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
     final dx = details.delta.dx;
