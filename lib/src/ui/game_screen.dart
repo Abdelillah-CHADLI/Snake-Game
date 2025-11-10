@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../game/game_controller.dart';
@@ -13,7 +14,40 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  // Drag start not needed currently; removed to satisfy linter
+  // Focus node to capture keyboard input (arrow keys/WASD if desired)
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    // Request focus after the first frame so the RawKeyboardListener receives events
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleKey(RawKeyEvent event) {
+    // Only handle key down to avoid duplicate handling on key up
+    if (event is! RawKeyDownEvent) return;
+    final controller = context.read<GameController>();
+    final key = event.logicalKey;
+    if (key == LogicalKeyboardKey.arrowUp) {
+      controller.setDirection(Direction.up);
+    } else if (key == LogicalKeyboardKey.arrowDown) {
+      controller.setDirection(Direction.down);
+    } else if (key == LogicalKeyboardKey.arrowLeft) {
+      controller.setDirection(Direction.left);
+    } else if (key == LogicalKeyboardKey.arrowRight) {
+      controller.setDirection(Direction.right);
+    }
+  }
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
     final dx = details.delta.dx;
@@ -82,13 +116,17 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           Expanded(
-            child: GestureDetector(
-              onHorizontalDragUpdate: _onHorizontalDragUpdate,
-              onVerticalDragUpdate: _onVerticalDragUpdate,
-              child: Center(
-                child: AspectRatio(
-                  aspectRatio: controller.cols / controller.rows,
-                  child: GameBoard(controller: controller),
+            child: RawKeyboardListener(
+              focusNode: _focusNode,
+              onKey: _handleKey,
+              child: GestureDetector(
+                onHorizontalDragUpdate: _onHorizontalDragUpdate,
+                onVerticalDragUpdate: _onVerticalDragUpdate,
+                child: Center(
+                  child: AspectRatio(
+                    aspectRatio: controller.cols / controller.rows,
+                    child: GameBoard(controller: controller),
+                  ),
                 ),
               ),
             ),
