@@ -33,20 +33,25 @@ class _GameScreenState extends State<GameScreen> {
     super.dispose();
   }
 
-  void _handleKey(RawKeyEvent event) {
+  KeyEventResult _handleKey(FocusNode node, RawKeyEvent event) {
     // Only handle key down to avoid duplicate handling on key up
-    if (event is! RawKeyDownEvent) return;
+    if (event is! RawKeyDownEvent) return KeyEventResult.ignored;
     final controller = context.read<GameController>();
     final key = event.logicalKey;
     if (key == LogicalKeyboardKey.arrowUp) {
       controller.setDirection(Direction.up);
+      return KeyEventResult.handled;
     } else if (key == LogicalKeyboardKey.arrowDown) {
       controller.setDirection(Direction.down);
+      return KeyEventResult.handled;
     } else if (key == LogicalKeyboardKey.arrowLeft) {
       controller.setDirection(Direction.left);
+      return KeyEventResult.handled;
     } else if (key == LogicalKeyboardKey.arrowRight) {
       controller.setDirection(Direction.right);
+      return KeyEventResult.handled;
     }
+    return KeyEventResult.ignored;
   }
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
@@ -116,7 +121,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           Expanded(
-            child: RawKeyboardListener(
+            child: Focus(
               focusNode: _focusNode,
               onKey: _handleKey,
               child: GestureDetector(
